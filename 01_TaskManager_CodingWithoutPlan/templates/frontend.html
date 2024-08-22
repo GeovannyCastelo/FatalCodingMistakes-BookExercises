@@ -1,0 +1,45 @@
+<!-- templates/frontend.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de tareas</title>
+</head>
+<body>
+    <h1>Añadir tarea</h1>
+    <ul id="task-list"></ul>
+    <input type="text" id="new-task-title" placeholder="Nueva tarea">
+    <button onclick="addTask()">Añadir</button>
+    <script>
+        function getTasks() {
+            fetch('/tasks')
+                .then(response => response.json())
+                .then(data => {
+                    const taskList = document.getElementById('task-list');
+                    taskList.innerHTML = '';
+                    data.forEach(task => {
+                        const li = document.createElement('li');
+                        li.textContent = `${task.title} - ${task.completed ? 'Completada' : 'Pendiente'}`;
+                        taskList.appendChild(li);
+                    });
+                });
+        }
+        function addTask() {
+            const title = document.getElementById('new-task-title').value;
+            fetch('/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title: title })
+            }).then(response => response.json())
+              .then(data => {
+                  getTasks();
+                  document.getElementById('new-task-title').value = '';
+              });
+        }
+        getTasks();
+    </script>
+</body>
+</html>
